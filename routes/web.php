@@ -21,6 +21,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/Amenazas','AmenazasController@index')->name('Amenazas');
+route::get('/Listadoshape','ListadoshapeController@index')->name('Listadoshape');
 Route::view('/contact', 'contact')->name('contact');
 Route::post('/contact', 'MessagesController@store');
 Auth::routes();
