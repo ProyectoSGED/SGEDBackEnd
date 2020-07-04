@@ -14,7 +14,7 @@ class CreteTabCategoriasShape extends Migration
     public function up()
     {
         Schema::create('tab_categorias_shape', function (Blueprint $table) {
-            $table->integer('id_categoria')->primary()->nullable(false);
+            $table->integer('id_categoria')->nullable(false)->autoIncrement();
             $table->string('nombre_categoria', 100)->nullable(false)->unique();
         });
     }

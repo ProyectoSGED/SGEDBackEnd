@@ -14,7 +14,7 @@ class CreateTabUsuariosPerfiles extends Migration
     public function up()
     {
         Schema::create('tab_usuario_perfiles', function (Blueprint $table) {
-            $table->integer('id_usuario_perfil')->nullable(false)->primary();
+            $table->integer('id_usuario_perfil')->nullable(false)->autoIncrement();
             $table->integer('id_usuario')->nullable(false);
             $table->integer('id_perfil')->nullable(false);
 

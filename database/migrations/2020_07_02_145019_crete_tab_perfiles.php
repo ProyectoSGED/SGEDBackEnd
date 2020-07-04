@@ -14,7 +14,7 @@ class CreteTabPerfiles extends Migration
     public function up()
     {
         Schema::create('tab_perfiles', function (Blueprint $table) {
-            $table->integer('id_perfil')->primary()->nullable(false);
+            $table->integer('id_perfil')->nullable(false)->autoIncrement();
             $table->string('nombre_perfil', 100)->nullable(false)->unique();
         });
     }

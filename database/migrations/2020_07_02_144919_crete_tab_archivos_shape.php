@@ -14,7 +14,7 @@ class CreteTabArchivosShape extends Migration
     public function up()
     {
         Schema::create('tab_archivos_shape', function (Blueprint $table) {
-            $table->integer('id_archivo_shape')->primary()->nullable(false);
+            $table->integer('id_archivo_shape')->nullable(false)->autoIncrement();
             $table->integer('id_shape')->nullable(false);
             $table->text('ruta_archivo_shape')->nullable(false);
 

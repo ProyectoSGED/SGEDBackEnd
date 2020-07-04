@@ -14,7 +14,7 @@ class CreteTabUsersTable extends Migration
     public function up()
     {
         Schema::create('tab_usuarios', function (Blueprint $table) {
-            $table->integer('id_usuario')->nullable(false)->primary();
+            $table->integer('id_usuario')->nullable(false)->autoIncrement();
             $table->string('nombre_usuario', 100)->nullable(false)->unique();
             $table->string('primer_nombre', 100)->nullable(false);
             $table->string('primer_apellido', 100)->nullable(false);

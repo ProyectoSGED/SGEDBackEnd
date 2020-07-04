@@ -14,7 +14,7 @@ class CreateTabShape extends Migration
     public function up()
     {
         Schema::create('tab_shape', function (Blueprint $table) {
-            $table->integer('id_shape')->primary()->nullable(false);
+            $table->integer('id_shape')->nullable(false)->autoIncrement();
             $table->text('nombre_shape')->nullable(false)->unique();
             $table->text('resumen_shape')->nullable(false);
             $table->string('autor', 100)->nullable(false);
