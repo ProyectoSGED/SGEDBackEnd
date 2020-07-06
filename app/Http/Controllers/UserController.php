@@ -17,7 +17,42 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $users = DB::table('tab_usuarios')
+            ->leftJoin('tab_usuario_perfiles', 'tab_usuarios.id_usuario', '=', 'tab_usuario_perfiles.id_usuario')
+            ->leftJoin('tab_perfiles', 'tab_usuario_perfiles.id_perfil', '=', 'tab_perfiles.id_perfil')
+            ->select(
+                'nombre_usuario',
+                'primer_nombre',
+                'primer_apellido',
+                'usuario_activo',
+                'tab_perfiles.nombre_perfil'
+            )
+            ->get();
+
+            if (!$users) {
+                return response()->json(
+                    [
+                        "status" => false,
+                        "error" => "No es posible obtener usuarios registrados..."
+                    ]
+                );
+            }
+
+            return response()->json(
+                [
+                    "status" => true,
+                    "users" => $users
+                ]
+            );
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    "status" => false,
+                    "error" => $e->getMessage()
+                ]
+            );
+        }
     }
 
     /**
@@ -89,7 +124,6 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
     }
 
     /**
@@ -149,6 +183,42 @@ class UserController extends Controller
                     "status" => true,
                     "message" => "Usuario actualizado con exito"
                 ]
+            );
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    "status" => false,
+                    "error" => $e->getMessage()
+                ]
+            );
+        }
+    }
+
+    public function deactivateUser(Request $request)
+    {
+        try {
+            $user = DB::table('tab_usuarios')
+                ->where('id_usuario', $request->input('id_usuario'))
+                ->update(
+                    [
+                        "usuario_activo" => false
+                    ]
+                );
+
+            if (!$user) {
+                return response()->json(
+                    [
+                            "status" => false,
+                            "error" => "No es posible desactivar cuenta de usuario..."
+                        ]
+                );
+            }
+
+            return response()->json(
+                [
+                        "status" => true,
+                        "message" => "Usuario desactivado con exito..."
+                    ]
             );
         } catch (Exception $e) {
             return response()->json(
