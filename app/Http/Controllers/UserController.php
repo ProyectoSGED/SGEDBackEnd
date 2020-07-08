@@ -22,12 +22,14 @@ class UserController extends Controller
             ->leftJoin('tab_usuario_perfiles', 'tab_usuarios.id_usuario', '=', 'tab_usuario_perfiles.id_usuario')
             ->leftJoin('tab_perfiles', 'tab_usuario_perfiles.id_perfil', '=', 'tab_perfiles.id_perfil')
             ->select(
+                'tab_usuarios.id_usuario',
                 'nombre_usuario',
                 'primer_nombre',
                 'primer_apellido',
                 'usuario_activo',
                 'tab_perfiles.nombre_perfil'
             )
+            ->orderBy('nombre_usuario')
             ->get();
 
             if (!$users) {
