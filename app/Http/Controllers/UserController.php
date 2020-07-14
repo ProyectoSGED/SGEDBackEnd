@@ -75,14 +75,29 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $user = new TabUser();
-
         try {
+            $user = DB::table('tab_usuarios')
+                ->select('id_usuario')
+                ->where('nombre_usuario', $request->input('nombre_usuario'))
+                ->get();
+
+            if ($user->count() > 0) {
+                return response()
+                    ->json(
+                        [
+                            "status"=>false,
+                            "error" => "Nombre de usuario ya se encuentra registrado..."
+                        ]
+                    );
+            }
+
+            $user = new TabUser();
+
             $user->nombre_usuario=$request->input('nombre_usuario');
             $user->primer_nombre = $request->input('primer_nombre');
             $user->primer_apellido =$request->input('primer_apellido');
             $user->password = Hash::make($request->input('password'));
-    
+            
                 
             if ($user->save()) {
                 $userProfile =  DB::table('tab_usuario_perfiles')->insert(
@@ -97,7 +112,7 @@ class UserController extends Controller
                 return response()->json(
                     [
                         "status" => false,
-                        "error" => "No es posible crear nuevo usuario"
+                        "error" => "No es posible crear nuevo usuario..."
                     ]
                 );
             }
@@ -105,7 +120,7 @@ class UserController extends Controller
             return response()->json(
                 [
                     "status" => true,
-                    "message" => "Usuario crado con exito"
+                    "message" => "Usuario creado con exito..."
                 ]
             );
         } catch (Exception $e) {

@@ -23,4 +23,8 @@ Route::group(['middleware' => ['cors']], function () {
     Route::post('/users/new', 'UserController@store');
     Route::put('/users/update', 'UserController@update');
     Route::delete('users/deactivate', 'UserController@deactivateUser');
+
+    Route::get('/profiles', 'ProfileController@index');
+
+    Route::get('/shapes/file', 'ShapeController@downloadShape');
 });
