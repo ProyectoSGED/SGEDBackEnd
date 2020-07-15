@@ -22,9 +22,11 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('/users/list', 'UserController@index');
     Route::post('/users/new', 'UserController@store');
     Route::put('/users/update', 'UserController@update');
-    Route::delete('users/deactivate', 'UserController@deactivateUser');
+    Route::delete('/users/deactivate', 'UserController@deactivateUser');
 
     Route::get('/profiles', 'ProfileController@index');
 
     Route::get('/shapes/file', 'ShapeController@downloadShape');
+    Route::get('/shapes/list', 'ShapeController@shapesByCategory');
+    Route::get('/shapes/categories', 'CategoriaShapeController@index');
 });

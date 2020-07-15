@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\models\TabArchivosShape;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class ShapeController extends Controller
+class CategoriaShapeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,40 +15,28 @@ class ShapeController extends Controller
      */
     public function index()
     {
-    }
-
-    public function shapesByCategory(Request $request)
-    {
         try {
-            $shapes = DB::table('tab_shape')
-                ->select(
-                    'id_shape',
-                    'nombre_shape',
-                    'resumen_shape',
-                    'autor',
-                    'fecha_publicacion',
-                    'fecha_creacion_metadato',
-                )
-                ->where('id_categoria', $request->input('id_categoria'))
+            $categoriasShape = DB::table('tab_categorias_shape')
+                ->select('id_categoria', 'nombre_categoria')
                 ->get();
 
-            if (!$shapes->count()) {
+            if (!$categoriasShape->count()) {
                 return response()
                         ->json(
                             [
                                 "status" => false,
-                                "error" => "No es posible obtener shapes para esta categoría..."
+                                "error" => 'No es posible obtener categorias de shape...'
                             ]
                         );
             }
 
             return response()
-                ->json(
-                    [
-                        "status" => true,
-                        "shapes" => $shapes
-                    ]
-                );
+                    ->json(
+                        [
+                            "status" => true,
+                            "categorias_shape" => $categoriasShape
+                        ]
+                    );
         } catch (Exception $e) {
             return response()
                 ->json(
@@ -125,29 +112,5 @@ class ShapeController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function downloadShape(Request $request)
-    {
-        try {
-            $shape = DB::table('tab_archivos_shape')
-                ->select("ruta_archivo_shape")
-                ->where('id_shape', $request->input('id_shape'))
-                ->get();
-
-            if ($shape->count() > 0) {
-                $file = public_path() . $shape[0]->ruta_archivo_shape;
-
-                return response()->download($file);
-            }
-        } catch (Exception $e) {
-            return response()
-                ->json(
-                    [
-                    "status" => false,
-                    "error" => $e->getMessage()
-                    ]
-                );
-        }
     }
 }
