@@ -57,6 +57,51 @@ class UserController extends Controller
         }
     }
 
+
+    public function getUserById(Request $request)
+    {
+        try {
+            $user = DB::table('tab_usuarios')
+                ->join('tab_usuario_perfiles', 'tab_usuarios.id_usuario', '=', 'tab_usuario_perfiles.id_usuario')
+                ->join('tab_perfiles', 'tab_perfiles.id_perfil', '=', 'tab_usuario_perfiles.id_perfil')
+                ->select(
+                    "tab_usuarios.nombre_usuario",
+                    "tab_usuarios.primer_nombre",
+                    "tab_usuarios.primer_apellido",
+                    "tab_usuarios.usuario_activo",
+                    "tab_perfiles.id_perfil",
+                    "tab_perfiles.nombre_perfil"
+                )
+                ->where("tab_usuarios.id_usuario", $request->input('id_usuario'))
+                ->get();
+
+            if (!$user->count()) {
+                return response()
+                    ->json(
+                        [
+                            "status" => false,
+                            "error" => "No es posible obtener usuario seleccionado..."
+                        ]
+                    );
+            }
+
+            return response()
+                ->json(
+                    [
+                        "status" => true,
+                        "user" => $user
+                    ]
+                );
+        } catch (Exception $e) {
+            return response()
+                ->json(
+                    [
+                        "status" => false,
+                        "error" => $e->getMessage()
+                    ]
+                );
+        }
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -171,8 +216,6 @@ class UserController extends Controller
                         'nombre_usuario' => $request->input('nombre_usuario'),
                         'primer_nombre' => $request->input('primer_nombre'),
                         'primer_apellido' => $request->input('primer_apellido'),
-                        //SE DEBE CONFIRMAR SI SOLO ADMIN DEL SISTEMA PUEDE EDITAR CONTRASEÑAS
-                        //'password' => Hash::make($request->input('password'));
                         'usuario_activo' => $request->input('usuario_activo')
                     ]
                 );
@@ -198,7 +241,7 @@ class UserController extends Controller
             return response()->json(
                 [
                     "status" => true,
-                    "message" => "Usuario actualizado con exito"
+                    "message" => "Usuario actualizado con exito..."
                 ]
             );
         } catch (Exception $e) {

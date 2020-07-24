@@ -31,6 +31,7 @@ class ShapeController extends Controller
                     'fecha_creacion_metadato',
                 )
                 ->where('id_categoria', $request->input('id_categoria'))
+                ->orderBy('fecha_publicacion', 'desc')
                 ->get();
 
             if (!$shapes->count()) {
