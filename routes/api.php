@@ -27,6 +27,7 @@ Route::group(['middleware' => ['cors']], function () {
 
     Route::get('/profiles', 'ProfileController@index');
 
+    Route::post('/shapes/new', "ShapeController@store");
     Route::get('/shapes/file', 'ShapeController@downloadShape');
     Route::get('/shapes/list', 'ShapeController@shapesByCategory');
     Route::get('/shapes/categories', 'CategoriaShapeController@index');
