@@ -43,7 +43,7 @@ class ShapeController extends Controller
                         ->json(
                             [
                                 "status" => false,
-                                "error" => "No es posible obtener shapes para esta categoría..."
+                                "error" => "No se encuentran archivos shapes para esta categoría..."
                             ]
                         );
             }
@@ -85,13 +85,16 @@ class ShapeController extends Controller
     public function store(Request $request)
     {
         try {
-            $validateDate = $request->validate([
+            set_time_limit(0);
+
+            $request->validate([
                 "shape_file" => 'required|mimes:zip',
-                "nombre_shape" => 'required',
-                "resumen_shape" => 'required',
-                "autor_shape" => 'required',
+                "nombre_shape" => 'required|string',
+                "resumen_shape" => 'required|string',
+                "autor_shape" => 'required|string',
                 "shape_fecha_metadato" => 'required|date',
-                "id_categoria" => 'required'
+                "id_categoria" => 'required|integer',
+                "nombre_categoria"=>'required|string'
             ]);
               
             $shape = DB::table("tab_shape")
@@ -111,27 +114,14 @@ class ShapeController extends Controller
 
             $shape = $request->file("shape_file");
 
-            $category = DB::table('tab_categorias_shape')
-                ->select("nombre_categoria")
-                ->where("id_categoria", $request->input("id_categoria"))
-                ->get();
+            $categoryName = str_replace(" ", "_", $request->input('nombre_categoria'));
 
-            if (!$category->count()) {
-                return response()
-                ->json(
-                    [
-                        "status" => false,
-                        "error" => "No existe categoría para registrar shape..."
-                    ]
-                );
+            $path = public_path()."/downloads/".$categoryName;
+
+            $response = file_exists($path);
+            if (!$response) {
+                mkdir($path);
             }
-
-            $path = public_path().'/downloads/nueva'/*.$category[0]->nombre_categoria*/;
-
-            $response = Storage::makeDirectory($path);
-
-            var_dump($path);
-            return;
 
             $response = file_exists($path."/".$shape->getClientOriginalName());
 
@@ -158,7 +148,7 @@ class ShapeController extends Controller
                     ->insert(
                         [
                             "id_shape" => $newShape->id_shape,
-                            "ruta_archivo_shape" => "/downloads/".$category[0]->nombre_categoria."/".$shape->getClientOriginalName()
+                            "ruta_archivo_shape" => "/downloads/".$categoryName."/".$shape->getClientOriginalName()
                         ]
                     );
             }
