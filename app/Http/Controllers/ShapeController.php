@@ -32,7 +32,7 @@ class ShapeController extends Controller
                     'resumen_shape',
                     'autor',
                     'fecha_publicacion',
-                    'fecha_creacion_metadato',
+                    'fecha_creacion_metadato'
                 )
                 ->where('id_categoria', $request->input('id_categoria'))
                 ->orderBy('fecha_publicacion', 'desc')
