@@ -120,7 +120,7 @@ class ShapeController extends Controller
 
             $response = file_exists($path);
             if (!$response) {
-                mkdir($path);
+                mkdir($path, 0755, true);
             }
 
             $response = file_exists($path."/".$shape->getClientOriginalName());
