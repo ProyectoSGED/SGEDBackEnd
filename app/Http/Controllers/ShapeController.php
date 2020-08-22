@@ -120,7 +120,7 @@ class ShapeController extends Controller
 
             $response = file_exists($path);
             if (!$response) {
-                mkdir($path, 0755, true);
+                Storage::makeDirectory($path);
             }
 
             $response = file_exists($path."/".$shape->getClientOriginalName());
