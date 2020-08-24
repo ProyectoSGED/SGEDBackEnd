@@ -116,13 +116,12 @@ class ShapeController extends Controller
 
             $categoryName = str_replace(" ", "_", $request->input('nombre_categoria'));
 
-            $path = "downloads/".$categoryName;
-
-            //$path = public_path()."/downloads/".$categoryName;
+            $path = public_path()."/downloads/".$categoryName;
 
             $response = file_exists($path);
+            
             if (!$response) {
-                Storage::makeDirectory($path);
+                mkdir($path."/", 0777, true, true);
             }
 
             $response = file_exists($path."/".$shape->getClientOriginalName());
