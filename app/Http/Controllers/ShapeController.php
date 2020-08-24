@@ -119,9 +119,9 @@ class ShapeController extends Controller
             $path = public_path()."/downloads/".$categoryName;
 
             $response = file_exists($path);
-            
+
             if (!$response) {
-                mkdir($path."/", 0777, true, true);
+                mkdir($path."/", 0777, true);
             }
 
             $response = file_exists($path."/".$shape->getClientOriginalName());
