@@ -116,7 +116,9 @@ class ShapeController extends Controller
 
             $categoryName = str_replace(" ", "_", $request->input('nombre_categoria'));
 
-            $path = public_path()."/downloads/".$categoryName;
+            $path = "downloads/".$categoryName;
+
+            //$path = public_path()."/downloads/".$categoryName;
 
             $response = file_exists($path);
             if (!$response) {
