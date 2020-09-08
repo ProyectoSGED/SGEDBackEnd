@@ -144,9 +144,9 @@ class ShapeController extends Controller
             
             DB::transaction(function () use ($request) {
                 $shape = DB::table("tab_shape")
-                ->select('id_shape')
-                ->where('nombre_shape', $request->input('nombre_shape'))
-                ->get();
+                    ->select('id_shape')
+                    ->where('nombre_shape', $request->input('nombre_shape'))
+                    ->get();
 
                 if ($shape->count() > 0) {
                     throw new Exception("Nombre de shape ya se encuentra registrado...");
@@ -296,14 +296,14 @@ class ShapeController extends Controller
                             File::delete($path);
                         }
 
+                        $categoryName = str_replace(" ", "_", $request->input('nombre_categoria'));
+
                         $shapeFile =  DB::table('tab_archivos_shape')
                             ->where('id_archivo_shape', $request->input('id_archivo'))
                             ->update([
-                                'ruta_archivo_shape' => "/downloads/{$request->input('nombre_categoria')}/{$request->file('shape_file')->getClientOriginalName()}"
+                                'ruta_archivo_shape' => "/downloads/{$categoryName}/{$request->file('shape_file')->getClientOriginalName()}"
                             ]);
                         
-
-                        $categoryName = str_replace(" ", "_", $request->input('nombre_categoria'));
                             
                         $path = public_path()."/downloads/{$categoryName}";
                         
@@ -342,9 +342,60 @@ class ShapeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                "id_shape" => "required|integer",
+            ]);
+
+            if ($validator->errors()->count() > 0) {
+                throw new Exception(
+                    $validator
+                        ->errors()
+                        ->first()
+                );
+            }
+
+            DB::transaction(function () use ($request) {
+                $shapeFiles = DB::table('tab_archivos_shape')
+                    ->select('ruta_archivo_shape')
+                    ->where('id_shape', $request->input('id_shape'))
+                    ->get();
+
+                DB::table('tab_archivos_shape')
+                    ->where("id_shape", $request->input('id_shape'))
+                    ->delete();
+
+                DB::table('tab_shape')
+                    ->where('id_shape', $request->input('id_shape'))
+                    ->delete();
+
+                foreach ($shapeFiles as $shapeFile) {
+                    $path = public_path().$shapeFile->ruta_archivo_shape;
+
+                    if (File::exists($path)) {
+                        File::delete($path);
+                    }
+                }
+            });
+
+            return response()
+                ->json(
+                    [
+                        "status" => true,
+                        "message" => "Capa de información fue eliminada con éxito"
+                    ]
+                );
+        } catch (Exception $e) {
+            return response()
+                ->json(
+                    [
+                        "status" => false,
+                        "error" => $e->getMessage()
+                    ]
+                );
+        }
     }
 
     public function downloadShape(Request $request)

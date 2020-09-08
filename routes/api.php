@@ -28,6 +28,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('/profiles', 'ProfileController@index');
 
     Route::put('/shapes/update', "ShapeController@update");
+    Route::delete('/shapes/delete', "ShapeController@destroy");
     Route::get('/shapes/list/all', "ShapeController@index");
     Route::post('/shapes/new', "ShapeController@store");
     Route::get('/shapes/file', 'ShapeController@downloadShape');
