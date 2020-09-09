@@ -193,15 +193,15 @@ class ShapeController extends Controller
                 }
 
                 $shapeFile = $shape->move($path, $shape->getClientOriginalName());
+            });
 
-                return response()
+            return response()
                 ->json(
                     [
                         "status" => true,
                         "message" => "Nuevo shape registrado con exito..."
                     ]
                 );
-            });
         } catch (Exception $e) {
             return response()
                 ->json(
