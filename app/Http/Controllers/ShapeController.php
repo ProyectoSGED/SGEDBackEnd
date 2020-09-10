@@ -236,6 +236,46 @@ class ShapeController extends Controller
         //
     }
 
+    public function getShapeById(Request $request)
+    {
+        try {
+            $shape = DB::table('tab_shape')
+                ->join("tab_categorias_shape", "tab_categorias_shape.id_categoria", "=", "tab_shape.id_categoria")
+                ->select(
+                    "tab_shape.id_shape",
+                    "tab_shape.nombre_shape",
+                    "tab_shape.resumen_shape",
+                    "tab_shape.autor",
+                    "tab_shape.fecha_creacion_metadato",
+                    "tab_shape.id_categoria",
+                    "tab_categorias_shape.nombre_categoria"
+                )
+                ->where("tab_shape.id_shape", $request->input("id_shape"))
+                ->get();
+
+            if (!$shape->count()) {
+                throw new Exception("No se encuentra shape seleccionado...");
+            }
+
+            return response()
+                ->json(
+                    [
+                        "status" => true,
+                        "shape" => $shape
+                    ]
+                );
+        } catch (Exception $e) {
+            return response()
+                ->json(
+                    [
+                        "status" => false,
+                        "error" => $e->getMessage()
+
+                    ]
+                );
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -257,7 +297,6 @@ class ShapeController extends Controller
                 "shape_fecha_metadato" => 'required|date',
                 "id_categoria" => 'required|integer',
                 "nombre_categoria" => 'string',
-                "id_archivo" => 'integer',
                 "update_shape_file" => 'boolean'
             ]);
 
@@ -282,38 +321,40 @@ class ShapeController extends Controller
                     ]);
 
                 if ($request->input('update_shape_file')) {
-                    $shapeFile = DB::table('tab_archivos_shape')
+                    $shapeFiles = DB::table('tab_archivos_shape')
                         ->select('ruta_archivo_shape')
-                        ->where('id_archivo_shape', $request->input('id_archivo'))
+                        ->where('id_shape', $request->input('id_shape'))
                         ->get();
 
-                    if ($shapeFile->count()) {
-                        $path = public_path().$shapeFile[0]->ruta_archivo_shape;
+                    if ($shapeFiles->count()) {
+                        foreach ($shapeFiles as $shapeFile) {
+                            $path = public_path().$shapeFile->ruta_archivo_shape;
 
-                        $response = File::exists($path);
-
-                        if ($response) {
-                            File::delete($path);
-                        }
-
-                        $categoryName = str_replace(" ", "_", $request->input('nombre_categoria'));
-
-                        $shapeFile =  DB::table('tab_archivos_shape')
-                            ->where('id_archivo_shape', $request->input('id_archivo'))
-                            ->update([
-                                'ruta_archivo_shape' => "/downloads/{$categoryName}/{$request->file('shape_file')->getClientOriginalName()}"
-                            ]);
-                        
+                            $response = File::exists($path);
+    
+                            if ($response) {
+                                File::delete($path);
+                            }
+    
+                            $categoryName = str_replace(" ", "_", $request->input('nombre_categoria'));
+    
+                            $shapeFile = DB::table('tab_archivos_shape')
+                                ->where('id_shape', $request->input('id_shape'))
+                                ->update([
+                                    'ruta_archivo_shape' => "/downloads/{$categoryName}/{$request->file('shape_file')->getClientOriginalName()}"
+                                ]);
                             
-                        $path = public_path()."/downloads/{$categoryName}";
-                        
-                        $file = $request->file('shape_file');
-                        
-                        if (File::exists("{$path}/{$file->getClientOriginalName()}")) {
-                            throw new Exception("Archivo seleccionado ya se encuentra registrado para categoría: {$request->input('nombre_categoria')}");
+                                
+                            $path = public_path()."/downloads/{$categoryName}";
+                            
+                            $file = $request->file('shape_file');
+                            
+                            if (File::exists("{$path}/{$file->getClientOriginalName()}")) {
+                                throw new Exception("Archivo seleccionado ya se encuentra registrado para categoría: {$request->input('nombre_categoria')}");
+                            }
+    
+                            $file->move($path, $file->getClientOriginalName());
                         }
-
-                        $file->move($path, $file->getClientOriginalName());
                     }
                 }
             });
