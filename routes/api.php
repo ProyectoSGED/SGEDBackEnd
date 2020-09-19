@@ -38,3 +38,9 @@ Route::group(['middleware' => ['cors']], function () {
 
     Route::post('/contact', "ContactController@sendContactMessage");
 });
+
+
+Route::middleware(['api'])->group(function ($router) {
+    Route::post('/signin', "AuthController@signin");
+    Route::post('/signout', "AuthController@signout");
+});

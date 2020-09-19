@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'api',
+        'passwords' => 'tab_usuarios',
     ],
 
     /*
@@ -42,8 +42,8 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
+            'driver' => 'jwt',
+            'provider' => 'tab_usuarios',
             'hash' => false,
         ],
     ],
@@ -66,9 +66,9 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'tab_usuarios' => [
             'driver' => 'eloquent',
-            'model' => App\User::class,
+            'model' => App\models\TabUser::class,
         ],
 
         // 'users' => [
