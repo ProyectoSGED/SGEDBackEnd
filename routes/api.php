@@ -42,5 +42,5 @@ Route::group(['middleware' => ['cors']], function () {
 
 Route::middleware(['api'])->group(function ($router) {
     Route::post('/signin', "AuthController@signin");
-    Route::post('/signout', "AuthController@signout");
+    Route::get('/signout', "AuthController@signout");
 });

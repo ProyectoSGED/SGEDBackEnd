@@ -19,7 +19,7 @@ class CreateTabShape extends Migration
             $table->text('resumen_shape')->nullable(false);
             $table->string('autor', 100)->nullable(false);
             $table->date('fecha_publicacion')->nullable(false);
-            $table->date('fecha_creacion_metadato')->nullable(false);
+            $table->string('formato_capa_informacion')->nullable(false);
             $table->integer('id_categoria')->nullable(false);
 
             $table->foreign('id_categoria')->references('id_categoria')->on('tab_categorias_shape');

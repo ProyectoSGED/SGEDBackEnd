@@ -77,7 +77,7 @@ class ShapeController extends Controller
                     'resumen_shape',
                     'autor',
                     'fecha_publicacion',
-                    'fecha_creacion_metadato'
+                    'formato_capa_informacion'
                 )
                 ->where('id_categoria', $request->input('id_categoria'))
                 ->orderBy('fecha_publicacion', 'desc')
@@ -88,7 +88,7 @@ class ShapeController extends Controller
                         ->json(
                             [
                                 "status" => false,
-                                "error" => "No se encuentran archivos shapes para esta categoría..."
+                                "error" => "No se encuentran capas de información para esta categoría..."
                             ]
                         );
             }
@@ -132,15 +132,26 @@ class ShapeController extends Controller
         try {
             set_time_limit(0);
 
-            $request->validate([
-                "shape_file" => 'required|mimes:zip',
-                "nombre_shape" => 'required|string',
-                "resumen_shape" => 'required|string',
-                "autor_shape" => 'required|string',
-                "shape_fecha_metadato" => 'required|date',
-                "id_categoria" => 'required|integer',
-                "nombre_categoria"=>'required|string'
-            ]);
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    "shape_file" => 'required|mimes:zip',
+                    "nombre_shape" => 'required|string',
+                    "resumen_shape" => 'required|string',
+                    "autor_shape" => 'required|string',
+                    "formato_capa_informacion" => 'required|string',
+                    "id_categoria" => 'required|integer',
+                    "nombre_categoria"=>'required|string'
+                ]
+            );
+
+            if ($validator->errors()->count() > 0) {
+                throw new Exception(
+                    $validator
+                        ->errors()
+                        ->first()
+                );
+            }
             
             DB::transaction(function () use ($request) {
                 $shape = DB::table("tab_shape")
@@ -149,7 +160,7 @@ class ShapeController extends Controller
                     ->get();
 
                 if ($shape->count() > 0) {
-                    throw new Exception("Nombre de shape ya se encuentra registrado...");
+                    throw new Exception("Nombre de capa de información ya se encuentra registrado...");
                 }
 
                 $shape = $request->file("shape_file");
@@ -175,7 +186,7 @@ class ShapeController extends Controller
                 $newShape->resumen_shape = $request->input("resumen_shape");
                 $newShape->autor = $request->input("autor_shape");
                 $newShape->fecha_publicacion = Carbon::now();
-                $newShape->fecha_creacion_metadato = $request->input("shape_fecha_metadato");
+                $newShape->formato_capa_informacion = $request->input("formato_capa_informacion");
                 $newShape->id_categoria = $request->input("id_categoria");
 
                 if ($newShape->save()) {
@@ -199,7 +210,7 @@ class ShapeController extends Controller
                 ->json(
                     [
                         "status" => true,
-                        "message" => "Nuevo shape registrado con exito..."
+                        "message" => "Nueva capa de información registrada con éxito..."
                     ]
                 );
         } catch (Exception $e) {
@@ -246,7 +257,7 @@ class ShapeController extends Controller
                     "tab_shape.nombre_shape",
                     "tab_shape.resumen_shape",
                     "tab_shape.autor",
-                    "tab_shape.fecha_creacion_metadato",
+                    "tab_shape.formato_capa_informacion",
                     "tab_shape.id_categoria",
                     "tab_categorias_shape.nombre_categoria"
                 )
@@ -254,7 +265,7 @@ class ShapeController extends Controller
                 ->get();
 
             if (!$shape->count()) {
-                throw new Exception("No se encuentra shape seleccionado...");
+                throw new Exception("No se encuentra capa de información seleccionada...");
             }
 
             return response()
@@ -294,7 +305,7 @@ class ShapeController extends Controller
                 "nombre_shape" => 'required|string',
                 "resumen_shape" => 'required|string',
                 "autor_shape" => 'required|string',
-                "shape_fecha_metadato" => 'required|date',
+                "formato_capa_informacion" => 'required|date',
                 "id_categoria" => 'required|integer',
                 "nombre_categoria" => 'string',
                 "update_shape_file" => 'boolean'
@@ -316,7 +327,7 @@ class ShapeController extends Controller
                         "nombre_shape" => $request->input('nombre_shape'),
                         "resumen_shape" => $request->input('resumen_shape'),
                         "autor" => $request->input('autor_shape'),
-                        "fecha_creacion_metadato" => $request->input('shape_fecha_metadato'),
+                        "formato_capa_informacion" => $request->input('formato_capa_informacion'),
                         "id_categoria" => $request->input('id_categoria')
                     ]);
 
