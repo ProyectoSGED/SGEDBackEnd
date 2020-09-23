@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use PhpParser\Node\Expr\Throw_;
 
 class ShapeController extends Controller
 {
@@ -56,6 +57,65 @@ class ShapeController extends Controller
                         "shapes" => $shapes
                     ]
                 );
+        } catch (Exception $e) {
+            return response()
+                ->json(
+                    [
+                        "status" => false,
+                        "error" => $e->getMessage()
+                    ]
+                );
+        }
+    }
+
+    public function findShapeByQuery(Request $request)
+    {
+        try {
+            $query = $request->input('query');
+
+            $queryTerms = explode(" ", $query);
+
+            foreach ($queryTerms as $key => $queryTerm) {
+                if ($key == 0) {
+                    $query = "{$queryTerm}:*";
+                } else {
+                    $query .= "|{$queryTerm}:*";
+                }
+            }
+
+            $shapes = DB::table('tab_shape')
+                ->leftJoin('tab_categorias_shape', 'tab_categorias_shape.id_categoria', '=', 'tab_shape.id_categoria')
+                ->select(
+                    'tab_shape.id_shape',
+                    'tab_shape.autor',
+                    'tab_shape.nombre_shape',
+                    'tab_shape.resumen_shape',
+                    'tab_shape.formato_capa_informacion',
+                    'tab_shape.fecha_publicacion',
+                    'tab_categorias_shape.nombre_categoria'
+                )
+                ->whereRaw(
+                    "to_tsvector(tab_shape.autor || '. ' || 
+                        tab_shape.nombre_shape || '. ' || 
+                        tab_shape.resumen_shape || '. ' || 
+                        tab_shape.formato_capa_informacion || '. ' || 
+                        tab_categorias_shape.nombre_categoria) 
+                    @@'{$query}'::tsquery"
+                )
+                ->orderBy('tab_shape.fecha_publicacion', 'DESC')
+                ->get();
+
+            if (!$shapes->count()) {
+                throw new Exception("No se encuentran resultados para termino buscado...");
+            }
+
+            return response()
+                    ->json(
+                        [
+                            "status" => true,
+                            "shapes" => $shapes
+                        ]
+                    );
         } catch (Exception $e) {
             return response()
                 ->json(
