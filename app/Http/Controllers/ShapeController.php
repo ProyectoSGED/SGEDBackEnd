@@ -77,7 +77,7 @@ class ShapeController extends Controller
                     "query" => 'required|string'
                 ]
             );
-                
+
             if ($validator->errors()->count() > 0) {
                 throw new Exception(
                     $validator
@@ -210,7 +210,7 @@ class ShapeController extends Controller
             $validator = Validator::make(
                 $request->all(),
                 [
-                    "shape_file" => 'required|mimes:zip',
+                    "shape_file" => 'required|mimes:zip,rar',
                     "nombre_shape" => 'required|string',
                     "resumen_shape" => 'required|string',
                     "autor_shape" => 'required|string',
@@ -380,7 +380,7 @@ class ShapeController extends Controller
                 "nombre_shape" => 'required|string',
                 "resumen_shape" => 'required|string',
                 "autor_shape" => 'required|string',
-                "formato_capa_informacion" => 'required|date',
+                "formato_capa_informacion" => 'required|string',
                 "id_categoria" => 'required|integer',
                 "nombre_categoria" => 'string',
                 "update_shape_file" => 'boolean'
