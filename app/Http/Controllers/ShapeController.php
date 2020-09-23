@@ -71,6 +71,21 @@ class ShapeController extends Controller
     public function findShapeByQuery(Request $request)
     {
         try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    "query" => 'required|string'
+                ]
+            );
+                
+            if ($validator->errors()->count() > 0) {
+                throw new Exception(
+                    $validator
+                        ->errors()
+                        ->first()
+                );
+            }
+
             $query = $request->input('query');
 
             $queryTerms = explode(" ", $query);
@@ -106,7 +121,7 @@ class ShapeController extends Controller
                 ->get();
 
             if (!$shapes->count()) {
-                throw new Exception("No se encuentran resultados para termino buscado...");
+                throw new Exception("No se encuentran resultados para término buscado...");
             }
 
             return response()
