@@ -36,6 +36,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('/shapes/list', 'ShapeController@shapesByCategory');
     Route::get('/shapes/categories', 'CategoriaShapeController@index');
     Route::get('/shapes/search', 'ShapeController@findShapeByQuery');
+    Route::get('/shapes/categories/all', 'ShapeController@getShapesCategories');
 
     Route::post('/contact', "ContactController@sendContactMessage");
 });

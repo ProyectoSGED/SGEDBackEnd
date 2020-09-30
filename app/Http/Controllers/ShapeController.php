@@ -142,6 +142,35 @@ class ShapeController extends Controller
         }
     }
 
+    public function getShapesCategories()
+    {
+        try {
+            $shapesCategories = DB::table('tab_categorias_shape')
+                ->orderBy('nombre_categoria', 'ASC')
+                ->get();
+            
+            if (!$shapesCategories->count()) {
+                throw new Exception("No se encuentran categorias de capas de información...");
+            }
+
+            return response()
+                ->json(
+                    [
+                        "status" => true,
+                        "shapes_categories" => $shapesCategories
+                    ]
+                );
+        } catch (Exception $e) {
+            response()
+                ->json(
+                    [
+                        "status" => false,
+                        "error" => $e->getMessage()
+                    ]
+                );
+        }
+    }
+
     public function shapesByCategory(Request $request)
     {
         try {
