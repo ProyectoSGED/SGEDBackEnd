@@ -19,7 +19,7 @@ class Cors
         $host = "*";
 
         if (isset($domain['host'])) {
-            $host = $domain['host'];
+            $host = $domain['host'] == "localhost" ? "*" : $domain['host'];
         }
 
         $response = $next($request);
