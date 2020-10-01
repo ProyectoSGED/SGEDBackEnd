@@ -125,6 +125,7 @@ class ShapeController extends Controller
             }
 
             return response()
+                    ->header('Access-Control-Allow-Origin', '*')
                     ->json(
                         [
                             "status" => true,
