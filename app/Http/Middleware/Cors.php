@@ -25,7 +25,7 @@ class Cors
         return $response;*/
 
         return $next($request)
-            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Origin', 'http://166.110.16.7:9000')
             ->header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE')
             ->header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Application, Origin, X-Auth-Token')
             ->header('Access-Control-Allow-Credentials', 'true');
