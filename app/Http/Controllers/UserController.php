@@ -7,7 +7,9 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -28,6 +30,7 @@ class UserController extends Controller
                 'primer_nombre',
                 'primer_apellido',
                 'usuario_activo',
+                'tab_usuarios.mail_usuario',
                 'tab_perfiles.nombre_perfil'
             )
             ->orderBy('nombre_usuario')
@@ -59,6 +62,28 @@ class UserController extends Controller
     }
 
 
+    public function verifyChangeUserPassword()
+    {
+        try {
+            $response =  Auth::user() ? Auth::user()->cambiar_password : false;
+
+            return response()
+                ->json(
+                    [
+                        "status" => true,
+                        "change_password" => $response
+                    ]
+                );
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    "status" => false,
+                    "error" => $e->getMessage()
+                ]
+            );
+        }
+    }
+
     public function getUserById(Request $request)
     {
         try {
@@ -68,6 +93,7 @@ class UserController extends Controller
                 ->select(
                     "tab_usuarios.nombre_usuario",
                     "tab_usuarios.primer_nombre",
+                    "tab_usuarios.mail_usuario",
                     "tab_usuarios.primer_apellido",
                     "tab_usuarios.usuario_activo",
                     "tab_perfiles.id_perfil",
@@ -122,6 +148,23 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                "nombre_usuario" => "required|string",
+                "primer_nombre"=>"required|string",
+                "primer_apellido" =>"required|string",
+                "mail_usuario"=>"required|email",
+                "password" => "required|min:8",
+                "id_perfil"=>"required|integer"
+            ]);
+    
+            if ($validator->errors()->count() > 0) {
+                throw new Exception(
+                    $validator
+                        ->errors()
+                        ->first()
+                );
+            }
+
             $user = DB::table('tab_usuarios')
                 ->select('id_usuario')
                 ->where('nombre_usuario', $request->input('nombre_usuario'))
@@ -142,6 +185,7 @@ class UserController extends Controller
             $user->nombre_usuario=$request->input('nombre_usuario');
             $user->primer_nombre = $request->input('primer_nombre');
             $user->primer_apellido =$request->input('primer_apellido');
+            $user->mail_usuario=$request->input('mail_usuario');
             $user->password = Hash::make($request->input('password'));
             
                 
@@ -163,6 +207,14 @@ class UserController extends Controller
                 );
             }
     
+            $fromEmail = env('MAIL_FROM_ADDRESS', "f26deb3a11-a27e01@inbox.mailtrap.io");
+
+            Mail::send('mails.resetPassword', ["tempPassword" => $request->input('password') ], function ($message) use ($request, $fromEmail) {
+                $message->to($request->input('user_email'));
+                $message->from($fromEmail);
+                $message->subject('noreply');
+            });
+
             return response()->json(
                 [
                     "status" => true,

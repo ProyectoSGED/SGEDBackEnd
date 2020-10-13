@@ -36,7 +36,9 @@ class ContactController extends Controller
                 $request->input('phone')
             );
 
-            Mail::to("f26deb3a11-a27e01@inbox.mailtrap.io")->send($contactMessage);
+            $toEmail = env('MAIL_FROM_ADDRESS', "f26deb3a11-a27e01@inbox.mailtrap.io");
+
+            Mail::to($toEmail)->send($contactMessage);
 
             return response()
                 ->json(

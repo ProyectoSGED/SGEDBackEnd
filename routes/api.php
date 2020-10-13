@@ -25,6 +25,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::post('/users/new', 'UserController@store');
     Route::put('/users/update', 'UserController@update');
     Route::delete('/users/deactivate', 'UserController@deactivateUser');
+    Route::get('/users/verify-change-password', 'UserController@verifyChangeUserPassword');
 
     Route::get('/profiles', 'ProfileController@index');
 
@@ -40,6 +41,8 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('/shapes/categories/all', 'ShapeController@getShapesCategories');
 
     Route::post('/contact', "ContactController@sendContactMessage");
+    Route::post('/password-reset', "AuthController@sendResetPasswordEmail");
+    Route::post('/password-change', "AuthController@changePassword");
 });
 
 
