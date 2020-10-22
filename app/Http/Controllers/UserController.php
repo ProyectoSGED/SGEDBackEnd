@@ -179,41 +179,43 @@ class UserController extends Controller
                         ]
                     );
             }
+            DB::transaction(function () use ($request) {
+                $user = new TabUser();
 
-            $user = new TabUser();
-
-            $user->nombre_usuario=$request->input('nombre_usuario');
-            $user->primer_nombre = $request->input('primer_nombre');
-            $user->primer_apellido =$request->input('primer_apellido');
-            $user->mail_usuario=$request->input('mail_usuario');
-            $user->password = Hash::make($request->input('password'));
+                $user->nombre_usuario=$request->input('nombre_usuario');
+                $user->primer_nombre = $request->input('primer_nombre');
+                $user->primer_apellido =$request->input('primer_apellido');
+                $user->mail_usuario=$request->input('mail_usuario');
+                $user->password = Hash::make($request->input('password'));
             
                 
-            if ($user->save()) {
-                $userProfile =  DB::table('tab_usuario_perfiles')->insert(
-                    [
+                if ($user->save()) {
+                    $userProfile =  DB::table('tab_usuario_perfiles')->insert(
+                        [
                         'id_usuario' => $user->id_usuario,
                         'id_perfil' => $request->input('id_perfil')
                     ]
-                );
-            }
+                    );
+                }
         
-            if (!$user && !$userProfile) {
-                return response()->json(
-                    [
+                if (!$user && !$userProfile) {
+                    return response()->json(
+                        [
                         "status" => false,
                         "error" => "No es posible crear nuevo usuario..."
                     ]
-                );
-            }
+                    );
+                }
     
-            $fromEmail = env('MAIL_FROM_ADDRESS', "f26deb3a11-a27e01@inbox.mailtrap.io");
+                $fromEmail = env('MAIL_FROM_ADDRESS', "f26deb3a11-a27e01@inbox.mailtrap.io");
 
-            Mail::send('mails.resetPassword', ["tempPassword" => $request->input('password') ], function ($message) use ($request, $fromEmail) {
-                $message->to($request->input('user_email'));
-                $message->from($fromEmail);
-                $message->subject('noreply');
+                Mail::send('mails.resetPassword', ["tempPassword" => $request->input('password') ], function ($message) use ($request, $fromEmail) {
+                    $message->to($request->input('mail_usuario'));
+                    $message->from($fromEmail);
+                    $message->subject('noreply');
+                });
             });
+            
 
             return response()->json(
                 [
@@ -269,7 +271,8 @@ class UserController extends Controller
                         'nombre_usuario' => $request->input('nombre_usuario'),
                         'primer_nombre' => $request->input('primer_nombre'),
                         'primer_apellido' => $request->input('primer_apellido'),
-                        'usuario_activo' => $request->input('usuario_activo')
+                        'usuario_activo' => $request->input('usuario_activo'),
+                        'mail_usuario'=>$request->input('mail_usuario')
                     ]
                 );
 

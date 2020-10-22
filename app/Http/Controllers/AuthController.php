@@ -96,7 +96,7 @@ class AuthController extends Controller
                 ->where('tab_usuarios.id_usuario', Auth::user()->id_usuario)
                 ->update(
                     [
-                        'tab_usuarios.password' => Hash::make($request->input('new_password')),
+                        'tab_usuarios.password' => Hash::make($request->input('password')),
                         'cambiar_password' => false
                     ]
                 );
