@@ -15,7 +15,7 @@ class AddEmailAndResetPasswordToTabUsuariosTable extends Migration
     public function up()
     {
         Schema::table('tab_usuarios', function (Blueprint $table) {
-            $table->string('mail_usuario', 100)->nullable(false)->default(Str::random(20))->unique();
+            $table->string('mail_usuario', 100)->nullable(true)->unique();
             $table->boolean("cambiar_password")->nullable(false)->default(true);
         });
     }
